@@ -9,6 +9,8 @@ var app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+require('./models/index');
+
 app.use('/', indexRouter);
 
 // catch 404 and forward to error handler

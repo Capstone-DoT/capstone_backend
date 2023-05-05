@@ -6,6 +6,9 @@
         "start": "node ./bin/www"
     },
     "dependencies": {
-        "express": "~4.16.1"
+        "dotenv": "^16.0.3",
+        "express": "~4.16.1",
+        "mysql2": "^3.2.4",
+        "sequelize": "^6.31.1"
     }
 }

@@ -138,10 +138,10 @@ module.exports = {
         message: '중복된 닉네임입니다.',
     },
 
-    SIGNIN_EMAIL_WRONG: {
+    SIGNIN_WRONG: {
         isSuccess: false,
         code: 3003,
-        message: '아이디가 잘못 되었습니다.',
+        message: '아이디 혹은 비밀번호가 잘못 되었습니다.',
     },
     SIGNIN_PASSWORD_WRONG: {
         isSuccess: false,

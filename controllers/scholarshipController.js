@@ -8,20 +8,17 @@ module.exports = {
         let urlStr = req.url;
         let urlObj = url.parse(urlStr, true);
         let type = urlObj.query.type;
-        let findResponse;
+        let ordering = urlObj.query.ordering;
         if (type == undefined) {
-            findResponse = await scholarshipService.findSCbyType('all');
-        } else if (type == 'jang') {
-            findResponse = await scholarshipService.findSCbyType('jang');
-        } else {
-            res.send(
-                errResponse({
-                    isSuccess: false,
-                    code: 404,
-                    message: '존재하지 않는 타입입니다',
-                })
-            );
+            type = 'all';
         }
+        if (ordering == undefined) {
+            ordering = 'new';
+        }
+        let findResponse = await scholarshipService.findScholarship(
+            type,
+            ordering
+        );
         res.send(findResponse);
     },
 };

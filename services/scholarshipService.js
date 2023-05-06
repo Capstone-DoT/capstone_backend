@@ -5,7 +5,7 @@ const models = require('../models');
 const Scholarship = models.scholarships;
 
 module.exports = {
-    findSCbyType: async (type) => {
+    findScholarship: async (type, ordering) => {
         try {
             let dday = sequelize.fn(
                 'datediff',
@@ -13,7 +13,7 @@ module.exports = {
                 sequelize.fn('NOW')
             );
             let findResult;
-            if (type == 'all') {
+            if (type == 'all' && ordering == 'new') {
                 findResult = await Scholarship.findAll({
                     attributes: [
                         'title',
@@ -21,6 +21,28 @@ module.exports = {
                         'type',
                         [dday, 'dday'],
                     ],
+                });
+            } else if (type != 'all' && ordering == 'new') {
+                findResult = await Scholarship.findAll({
+                    attributes: [
+                        'title',
+                        'institution',
+                        'type',
+                        [dday, 'dday'],
+                    ],
+                    where: {
+                        type: type,
+                    },
+                });
+            } else if (type == 'all' && ordering != 'new') {
+                findResult = await Scholarship.findAll({
+                    attributes: [
+                        'title',
+                        'institution',
+                        'type',
+                        [dday, 'dday'],
+                    ],
+                    order: [ordering],
                 });
             } else {
                 findResult = await Scholarship.findAll({
@@ -33,6 +55,7 @@ module.exports = {
                     where: {
                         type: type,
                     },
+                    order: [ordering],
                 });
             }
             return response(baseResponse.SUCCESS, findResult);

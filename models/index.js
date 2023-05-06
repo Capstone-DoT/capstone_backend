@@ -25,5 +25,6 @@ sequelize
     });
 
 db.scholarships = require('./Scholarship.js')(sequelize, DataTypes);
+db.users = require('./User.js')(sequelize, DataTypes);
 
 module.exports = db;

@@ -10,7 +10,7 @@ module.exports = {
         let type = urlObj.query.type;
         let findResponse;
         if (type == undefined) {
-            findResponse = await scholarshipService.findAllSC();
+            findResponse = await scholarshipService.findSCbyType('all');
         } else if (type == 'jang') {
             findResponse = await scholarshipService.findSCbyType('jang');
         } else {

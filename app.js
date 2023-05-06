@@ -4,6 +4,7 @@ var path = require('path');
 
 var indexRouter = require('./routes/index');
 var scholarshipRouter = require('./routes/scholarshipRoute');
+var userRouter = require('./routes/userRoute');
 
 var app = express();
 
@@ -14,6 +15,7 @@ require('./models/index');
 
 app.use('/', indexRouter);
 app.use('/scholarship', scholarshipRouter);
+app.use('/user', userRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

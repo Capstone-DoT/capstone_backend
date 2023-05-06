@@ -3,7 +3,7 @@ var express = require('express');
 var path = require('path');
 
 var indexRouter = require('./routes/index');
-var scholarshipRouter = require('./routes/scholarshipRouter');
+var scholarshipRouter = require('./routes/scholarshipRoute');
 
 var app = express();
 

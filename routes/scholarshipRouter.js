@@ -3,6 +3,6 @@ const router = express.Router();
 
 const scholarshipController = require('../controllers/scholarshipController');
 
-router.get('/', scholarshipController.getAllScholarships);
+router.get('/', scholarshipController.getScholarships);
 
 module.exports = router;

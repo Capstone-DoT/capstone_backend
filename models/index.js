@@ -24,4 +24,6 @@ sequelize
         console.error(err);
     });
 
+db.scholarships = require('./Scholarship.js')(sequelize, DataTypes);
+
 module.exports = db;

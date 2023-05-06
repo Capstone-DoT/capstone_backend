@@ -3,13 +3,17 @@ var express = require('express');
 var path = require('path');
 
 var indexRouter = require('./routes/index');
+var scholarshipRouter = require('./routes/scholarshipRouter');
 
 var app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+require('./models/index');
+
 app.use('/', indexRouter);
+app.use('/scholarship', scholarshipRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

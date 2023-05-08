@@ -17,7 +17,7 @@ module.exports = {
             type = { [Op.not]: null };
         }
 
-        if ((ordering == undefined) | (type == 'id')) {
+        if ((ordering == undefined) | (type == 'new')) {
             ordering = [['id', 'DESC']];
         } else if (ordering == 'view_num') {
             ordering = [['view_num', 'DESC']];

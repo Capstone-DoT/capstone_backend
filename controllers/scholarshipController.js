@@ -11,6 +11,7 @@ module.exports = {
         let urlObj = url.parse(urlStr, true);
         let type = urlObj.query.type;
         let ordering = urlObj.query.ordering;
+        let search = urlObj.query.search;
 
         if ((type == undefined) | (type == 'all')) {
             type = { [Op.not]: null };
@@ -24,9 +25,16 @@ module.exports = {
             ordering = [ordering];
         }
 
+        if ((search == undefined) | (search == 'all')) {
+            search = { [Op.not]: null };
+        } else {
+            search = { [Op.like]: `%${search}%` };
+        }
+
         let findResponse = await scholarshipService.findScholarship(
             type,
-            ordering
+            ordering,
+            search
         );
         res.send(findResponse);
     },

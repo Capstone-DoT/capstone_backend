@@ -6,7 +6,7 @@ const Scholarship = models.scholarships;
 const Op = sequelize.Op;
 
 module.exports = {
-    findScholarship: async (type, ordering) => {
+    findScholarship: async (type, ordering, search) => {
         try {
             let dday = sequelize.fn(
                 'datediff',
@@ -17,6 +17,7 @@ module.exports = {
                 attributes: ['title', 'institution', 'type', [dday, 'dday']],
                 where: {
                     type: type,
+                    title: search,
                 },
                 order: ordering,
             });

@@ -11,16 +11,19 @@ module.exports = {
         let urlObj = url.parse(urlStr, true);
         let type = urlObj.query.type;
         let ordering = urlObj.query.ordering;
-        if (type == undefined) {
+
+        if ((type == undefined) | (type == 'all')) {
             type = { [Op.not]: null };
         }
-        if (ordering == undefined) {
+
+        if ((ordering == undefined) | (type == 'id')) {
             ordering = [['id', 'DESC']];
         } else if (ordering == 'view_num') {
             ordering = [['view_num', 'DESC']];
         } else {
             ordering = [ordering];
         }
+
         let findResponse = await scholarshipService.findScholarship(
             type,
             ordering

@@ -6,12 +6,13 @@ const sequelize = require('sequelize');
 const Op = sequelize.Op;
 
 module.exports = {
-    getScholarships: async (req, res) => {
+    getContentList: async (req, res) => {
         let urlStr = req.url;
         let urlObj = url.parse(urlStr, true);
         let type = urlObj.query.type;
         let ordering = urlObj.query.ordering;
         let search = urlObj.query.search;
+        let pathname = urlObj.pathname;
 
         if ((type == undefined) | (type == 'all')) {
             type = { [Op.not]: null };
@@ -31,7 +32,12 @@ module.exports = {
             search = { [Op.like]: `%${search}%` };
         }
 
-        let findResponse = await contentService.findScholarship(
+        // let contentType =
+        //     pathname.substr(1, 1).toUpperCase() + pathname.substr(2);
+        let contentType = pathname.substr(1);
+
+        let findResponse = await contentService.findContentList(
+            contentType,
             type,
             ordering,
             search

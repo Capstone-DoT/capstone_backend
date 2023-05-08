@@ -22,4 +22,19 @@ module.exports = {
             return errResponse(baseResponse.DB_ERROR);
         }
     },
+    destroyBookmark: async (type, contentId, userId) => {
+        try {
+            await Bookmark.destroy({
+                where: {
+                    type: type,
+                    contentId: contentId,
+                    userId: userId,
+                },
+            });
+            return response(baseResponse.SUCCESS);
+        } catch (err) {
+            console.log(err);
+            return errResponse(baseResponse.DB_ERROR);
+        }
+    },
 };

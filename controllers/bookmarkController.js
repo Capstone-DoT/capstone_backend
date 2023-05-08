@@ -21,4 +21,21 @@ module.exports = {
             res.send(errResponse(baseResponse.SERVER_ERROR));
         }
     },
+    deleteBookmark: async (req, res) => {
+        let type = req.body.type;
+        let contentId = req.body.contentId;
+        let userId = req.id;
+        let destroyResult;
+        try {
+            destroyResult = await bookmarkService.destroyBookmark(
+                type,
+                contentId,
+                userId
+            );
+            res.send(destroyResult);
+        } catch (err) {
+            console.log(err);
+            res.send(errResponse(baseResponse.SERVER_ERROR));
+        }
+    },
 };

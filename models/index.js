@@ -26,6 +26,7 @@ sequelize
 
 db.scholarships = require('./Scholarship.js')(sequelize, DataTypes);
 db.activities = require('./Activity.js')(sequelize, DataTypes);
+db.contests = require('./Contest.js')(sequelize, DataTypes);
 db.users = require('./User.js')(sequelize, DataTypes);
 
 module.exports = db;

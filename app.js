@@ -3,7 +3,7 @@ var express = require('express');
 var path = require('path');
 
 var indexRouter = require('./routes/index');
-var scholarshipRouter = require('./routes/scholarshipRoute');
+var ContentRouter = require('./routes/contentRoute');
 var userRouter = require('./routes/userRoute');
 var bookmarkRouter = require('./routes/bookmarkRoute');
 
@@ -15,7 +15,7 @@ app.use(express.urlencoded({ extended: false }));
 require('./models/index');
 
 app.use('/', indexRouter);
-app.use('/scholarship', scholarshipRouter);
+app.use('/content', ContentRouter);
 app.use('/user', userRouter);
 app.use('/bookmark', bookmarkRouter);
 

@@ -1,6 +1,6 @@
 const baseResponse = require('../config/baseResponseStatus');
 const { response, errResponse } = require('../config/response');
-const scholarshipService = require('../services/scholarshipService');
+const contentService = require('../services/contentService');
 const url = require('url');
 const sequelize = require('sequelize');
 const Op = sequelize.Op;
@@ -31,7 +31,7 @@ module.exports = {
             search = { [Op.like]: `%${search}%` };
         }
 
-        let findResponse = await scholarshipService.findScholarship(
+        let findResponse = await contentService.findScholarship(
             type,
             ordering,
             search

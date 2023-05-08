@@ -159,6 +159,11 @@ module.exports = {
         message: '탈퇴 된 계정입니다. 고객센터에 문의해주세요.',
     },
 
+    BOOKMARK_REDUNDANT: {
+        isSuccess: false,
+        code: 409,
+        message: '이미 관심목록에 존재합니다.',
+    },
     //Connection, Transaction 등의 서버 오류
     DB_ERROR: { isSuccess: false, code: 4000, message: '데이터 베이스 에러' },
     SERVER_ERROR: { isSuccess: false, code: 4001, message: '서버 에러' },

@@ -44,4 +44,35 @@ module.exports = {
         );
         res.send(findResponse);
     },
+    getContentInfo: async (req, res) => {
+        try {
+            let urlStr = req.url;
+            let urlObj = url.parse(urlStr, true);
+            let pathname = urlObj.pathname;
+
+            let contentType = pathname.slice(1, -2);
+            let contentId = req.params.id;
+
+            let findResponse = await contentService.findContent(
+                contentType,
+                contentId
+            );
+
+            let updateResult;
+            try {
+                updateResult = await contentService.updateContentView(
+                    contentType,
+                    contentId
+                );
+            } catch (err) {
+                console.log(err);
+                res.send(updateResult);
+            }
+
+            res.send(findResponse);
+        } catch (err) {
+            console.log(err);
+            res.send(errResponse(baseResponse.SERVER_ERROR));
+        }
+    },
 };

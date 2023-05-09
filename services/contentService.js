@@ -46,4 +46,37 @@ module.exports = {
             return errResponse(baseResponse.DB_ERROR);
         }
     },
+    findContent: async (contentType, contentId) => {
+        try {
+            const contentModel = Content[contentType];
+            const findResult = await contentModel.findOne({
+                where: {
+                    id: contentId,
+                },
+            });
+            return response(baseResponse.SUCCESS, findResult);
+        } catch (err) {
+            console.log(err);
+            return errResponse(baseResponse.DB_ERROR);
+        }
+    },
+    updateContentView: async (contentType, contentId) => {
+        try {
+            const contentModel = Content[contentType];
+            const updateResult = await contentModel.update(
+                {
+                    view_num: sequelize.literal('view_num + 1'),
+                },
+                {
+                    where: {
+                        id: contentId,
+                    },
+                }
+            );
+            return response(baseResponse.SUCCESS, updateResult);
+        } catch (err) {
+            console.log(err);
+            return errResponse(baseResponse.DB_ERROR);
+        }
+    },
 };

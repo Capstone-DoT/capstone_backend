@@ -37,13 +37,7 @@ module.exports = {
             res.send(errResponse(baseResponse.SERVER_ERROR));
         }
         if (userResult != null) {
-            res.send(
-                errResponse({
-                    isSuccess: false,
-                    code: 200,
-                    message: '이미 존재하는 아이디입니다',
-                })
-            );
+            res.send(errResponse(baseResponse.SIGNUP_REDUNDANT_ID));
         } else {
             try {
                 let hashedResult = await createHashedPassword(

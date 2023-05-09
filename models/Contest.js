@@ -20,7 +20,10 @@ module.exports = (sequelize, DataTypes) => {
             start_date: DataTypes.DATEONLY,
             end_date: DataTypes.DATEONLY,
             benefit: DataTypes.STRING(256),
-            view_num: DataTypes.INTEGER(10),
+            view_num: {
+                type: DataTypes.INTEGER(10),
+                defaultValue: 0,
+            },
         },
         {
             updatedAt: false,

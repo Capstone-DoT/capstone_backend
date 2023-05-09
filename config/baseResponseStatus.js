@@ -164,6 +164,13 @@ module.exports = {
         code: 409,
         message: '이미 관심목록에 존재합니다.',
     },
+
+    NOT_FOUND: {
+        isSuccess: false,
+        code: 404,
+        message: '존재하지 않는 uri입니다.',
+    },
+
     //Connection, Transaction 등의 서버 오류
     DB_ERROR: { isSuccess: false, code: 4000, message: '데이터 베이스 에러' },
     SERVER_ERROR: { isSuccess: false, code: 4001, message: '서버 에러' },

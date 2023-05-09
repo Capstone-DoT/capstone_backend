@@ -22,10 +22,13 @@ module.exports = (sequelize, DataTypes) => {
             target: DataTypes.STRING(256),
             start_date: DataTypes.DATEONLY,
             end_date: DataTypes.DATEONLY,
-            view_num: DataTypes.INTEGER(10),
+            view_num: {
+                type: DataTypes.INTEGER(10),
+                defaultValue: 0,
+            },
         },
         {
-            timestamps: false,
+            updatedAt: false,
         }
     );
     return Activity;

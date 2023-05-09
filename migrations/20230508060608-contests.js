@@ -22,7 +22,13 @@ module.exports = {
             start_date: Sequelize.DATEONLY,
             end_date: Sequelize.DATEONLY,
             benefit: Sequelize.STRING(256),
-            view_num: Sequelize.INTEGER(10),
+            view_num: {
+                type: Sequelize.INTEGER(10),
+                defaultValue: 0,
+            },
+            createdAt: {
+                type: Sequelize.DATE,
+            },
         });
     },
 

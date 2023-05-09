@@ -7,6 +7,9 @@ var ContentRouter = require('./routes/contentRoute');
 var userRouter = require('./routes/userRoute');
 var bookmarkRouter = require('./routes/bookmarkRoute');
 
+const baseResponse = require('./config/baseResponseStatus');
+const { response, errResponse } = require('./config/response');
+
 var app = express();
 
 app.use(express.json());
@@ -32,7 +35,7 @@ app.use(function (err, req, res, next) {
 
     // render the error page
     res.status(err.status || 500);
-    res.render('error');
+    res.send(errResponse(baseResponse.NOT_FOUND));
 });
 
 module.exports = app;

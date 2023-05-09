@@ -75,4 +75,43 @@ module.exports = {
             res.send(errResponse(baseResponse.SERVER_ERROR));
         }
     },
+    getAllContentList: async (req, res) => {
+        let urlStr = req.url;
+        let urlObj = url.parse(urlStr, true);
+        let contentType = urlObj.query.type;
+        let ordering = urlObj.query.ordering;
+        let search = urlObj.query.search;
+
+        if (contentType == 'scholarship') {
+            contentType = 'Scholarships';
+        } else if (contentType == 'Activity') {
+            contentType = 'Activities';
+        } else if (contentType == 'contest') {
+            contentType = 'Contests';
+        }
+
+        if ((ordering == undefined) | (ordering == 'new')) {
+            ordering = 'createdAt DESC';
+        } else if (ordering == 'view_num') {
+            ordering = 'view_num DESC';
+        } else {
+            ordering = ordering;
+        }
+
+        if ((search == undefined) | (search == 'all')) {
+            search = '%%';
+        } else {
+            search = '%' + search + '%';
+        }
+
+        if ((contentType == undefined) | (contentType == 'all')) {
+            contentType = 'allContentType';
+        }
+        let findResult = await contentService.findAllContentList(
+            contentType,
+            ordering,
+            search
+        );
+        res.send(findResult);
+    },
 };

@@ -22,6 +22,9 @@ module.exports = {
             start_date: Sequelize.DATEONLY,
             end_date: Sequelize.DATEONLY,
             view_num: Sequelize.INTEGER(10),
+            createdAt: {
+                type: Sequelize.DATE,
+            },
         });
     },
 

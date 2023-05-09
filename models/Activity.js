@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
             view_num: DataTypes.INTEGER(10),
         },
         {
-            timestamps: false,
+            updatedAt: false,
         }
     );
     return Activity;

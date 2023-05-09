@@ -1,6 +1,7 @@
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
+var cors = require('cors');
 
 var indexRouter = require('./routes/index');
 var ContentRouter = require('./routes/contentRoute');
@@ -21,6 +22,13 @@ app.use('/', indexRouter);
 app.use('/content', ContentRouter);
 app.use('/user', userRouter);
 app.use('/bookmark', bookmarkRouter);
+
+const corsOptions = {
+    origin: '*',
+    credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

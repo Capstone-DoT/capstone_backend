@@ -46,4 +46,19 @@ module.exports = {
             return errResponse(baseResponse.DB_ERROR);
         }
     },
+
+    findContent: async (contentType, contentId) => {
+        try {
+            const contentModel = Content[contentType];
+            const findResult = await contentModel.findOne({
+                where: {
+                    id: contentId,
+                },
+            });
+            return response(baseResponse.SUCCESS, findResult);
+        } catch (err) {
+            console.log(err);
+            return errResponse(baseResponse.DB_ERROR);
+        }
+    },
 };

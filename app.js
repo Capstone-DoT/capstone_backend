@@ -1,6 +1,7 @@
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
+var cors = require('cors');
 
 var indexRouter = require('./routes/index');
 var ContentRouter = require('./routes/contentRoute');
@@ -11,6 +12,13 @@ const baseResponse = require('./config/baseResponseStatus');
 const { response, errResponse } = require('./config/response');
 
 var app = express();
+
+const corsOptions = {
+    origin: '*',
+    credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

@@ -57,6 +57,18 @@ module.exports = {
                 contentType,
                 contentId
             );
+
+            let updateResult;
+            try {
+                updateResult = await contentService.updateContentView(
+                    contentType,
+                    contentId
+                );
+            } catch (err) {
+                console.log(err);
+                res.send(updateResult);
+            }
+
             res.send(findResponse);
         } catch (err) {
             console.log(err);

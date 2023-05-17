@@ -83,7 +83,7 @@ module.exports = {
 
         if (contentType == 'scholarship') {
             contentType = 'Scholarships';
-        } else if (contentType == 'Activity') {
+        } else if (contentType == 'activity') {
             contentType = 'Activities';
         } else if (contentType == 'contest') {
             contentType = 'Contests';

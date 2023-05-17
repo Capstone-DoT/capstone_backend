@@ -110,20 +110,18 @@ module.exports = {
     findAllContentList: async (contentType, ordering, search) => {
         try {
             let queryString = ``;
-            if (contentType == 'allContentType') {
-                queryString = `SELECT title, institution, type, DATEDIFF(CURRENT_DATE(), end_date) as dday, view_num, createdAt FROM Scholarships
-            WHERE title LIKE '${search}'
-            UNION
-            SELECT title, institution, type, DATEDIFF(CURRENT_DATE(), end_date) as dday, view_num, createdAt from Activities
-            WHERE title LIKE '${search}'
-            UNION
-            SELECT title, institution, type, DATEDIFF(CURRENT_DATE(), end_date) as dday, view_num, createdAt from Contests
-            WHERE title LIKE '${search}'
-            ORDER BY ${ordering}`;
+            if (contentType === 'allContentType') {
+                queryString = `SELECT title, institution, type, (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(period, '~', -1), '(', 1), '%Y. %m. %d.'),CURDATE())) as dday, view_num, createdAt FROM Scholarships WHERE title LIKE '%${search}%'
+        UNION
+        SELECT title, institution, type, (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE()) + 1) as dday, view_num, createdAt from Activities WHERE title LIKE '%${search}%'
+        UNION
+        SELECT title, institution, type, (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE()) + 1) as dday, view_num, createdAt from Contests WHERE title LIKE '%${search}%'
+        ORDER BY ${ordering}`;
+            } else if (contentType === 'Scholarships') {
+                queryString = `SELECT title, institution, type, (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(period, '~', -1), '(', 1), '%Y. %m. %d.'),CURDATE())) as dday, view_num, createdAt FROM Scholarships WHERE title LIKE '%${search}%'`;
             } else {
-                queryString = `SELECT title, institution, type, DATEDIFF(CURRENT_DATE(), end_date) as dday, view_num, createdAt FROM ${contentType}
-            WHERE title LIKE '${search}'
-            ORDER BY ${ordering}`;
+                queryString = `SELECT title, institution, type, (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE()) + 1) as dday, view_num, createdAt FROM ${contentType} WHERE title LIKE '%${search}%'
+        ORDER BY ${ordering}`;
             }
             const findResult = await db.query(queryString, {
                 type: sequelize.QueryTypes.SELECT,

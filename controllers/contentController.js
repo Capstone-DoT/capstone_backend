@@ -9,13 +9,13 @@ module.exports = {
     getContentList: async (req, res) => {
         let urlStr = req.url;
         let urlObj = url.parse(urlStr, true);
-        let type = urlObj.query.type;
+        let type = req.body.type;
         let ordering = urlObj.query.ordering;
         let search = urlObj.query.search;
         let pathname = urlObj.pathname;
 
         if ((type == undefined) | (type == 'all')) {
-            type = { [Op.not]: null };
+            type = [];
         }
 
         if ((ordering == undefined) | (type == 'new')) {

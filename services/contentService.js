@@ -27,6 +27,11 @@ module.exports = {
         try {
             const contentModel = Content[contentType];
             let findResult;
+            const conditions = type.map((value) => ({
+                type: {
+                    [Op.substring]: value,
+                },
+            }));
             if (contentType == 'scholarship') {
                 findResult = await contentModel.findAll({
                     attributes: [
@@ -42,7 +47,7 @@ module.exports = {
                         ],
                     ],
                     where: {
-                        type,
+                        [Op.and]: conditions,
                         title: search,
                     },
                     order: ordering,
@@ -61,7 +66,7 @@ module.exports = {
                         ],
                     ],
                     where: {
-                        type,
+                        [Op.and]: conditions,
                         title: search,
                     },
                     order: ordering,

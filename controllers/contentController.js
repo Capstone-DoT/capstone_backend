@@ -48,9 +48,8 @@ module.exports = {
         try {
             let urlStr = req.url;
             let urlObj = url.parse(urlStr, true);
-            let pathname = urlObj.pathname;
 
-            let contentType = pathname.slice(1, -2);
+            let contentType = urlObj.pathname.split('/')[1];
             let contentId = req.params.id;
 
             let findResponse = await contentService.findContent(

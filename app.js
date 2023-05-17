@@ -2,6 +2,7 @@ var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cors = require('cors');
+var morgan = require('morgan');
 
 var indexRouter = require('./routes/index');
 var ContentRouter = require('./routes/contentRoute');
@@ -22,6 +23,8 @@ app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+app.use(morgan('dev'));
 
 require('./models/index');
 

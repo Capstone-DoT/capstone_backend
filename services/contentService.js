@@ -25,32 +25,48 @@ const Op = sequelize.Op;
 module.exports = {
     findContentList: async (contentType, type, ordering, search) => {
         try {
-            let dday = sequelize.fn(
-                'datediff',
-                sequelize.col('end_date'),
-                sequelize.fn('NOW')
-            );
             const contentModel = Content[contentType];
-            const findResult = await contentModel.findAll({
-                attributes: [
-                    'title',
-                    'institution',
-                    'type',
-                    [
-                        sequelize.fn(
-                            'datediff',
-                            sequelize.col('end_date'),
-                            sequelize.fn('NOW')
-                        ),
-                        'dday',
+            let findResult;
+            if (contentType == 'scholarship') {
+                findResult = await contentModel.findAll({
+                    attributes: [
+                        'title',
+                        'institution',
+                        'type',
+                        [
+                            sequelize.literal(`DATEDIFF(
+        STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(period, '~', -1), '(', 1), '%Y. %m. %d.'),
+        CURDATE()
+      )`),
+                            'dday',
+                        ],
                     ],
-                ],
-                where: {
-                    type,
-                    title: search,
-                },
-                order: ordering,
-            });
+                    where: {
+                        type,
+                        title: search,
+                    },
+                    order: ordering,
+                });
+            } else {
+                findResult = await contentModel.findAll({
+                    attributes: [
+                        'title',
+                        'institution',
+                        'type',
+                        [
+                            sequelize.literal(
+                                `DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE()) + 1`
+                            ),
+                            'dday',
+                        ],
+                    ],
+                    where: {
+                        type,
+                        title: search,
+                    },
+                    order: ordering,
+                });
+            }
             return response(baseResponse.SUCCESS, findResult);
         } catch (err) {
             console.log(err);

@@ -13,6 +13,7 @@ module.exports = {
         let ordering = urlObj.query.ordering;
         let search = urlObj.query.search;
         let pathname = urlObj.pathname;
+        let pageNo = req.query.pageno;
 
         if ((type == undefined) | (type == 'all')) {
             type = [];
@@ -36,13 +37,37 @@ module.exports = {
         //     pathname.substr(1, 1).toUpperCase() + pathname.substr(2);
         let contentType = pathname.substr(1);
 
+        if (pageNo == undefined) {
+            pageNo = 0;
+        } else {
+            pageNo = parseInt(pageNo);
+        }
+
         let findResponse = await contentService.findContentList(
             contentType,
             type,
             ordering,
             search
         );
-        res.send(findResponse);
+
+        if (pageNo > 0) {
+            var totalCount = findResponse.result.length;
+            var startItemNo = (pageNo - 1) * 20;
+            var endItemNo = pageNo * 20 - 1;
+            if (endItemNo > totalCount - 1) {
+                endItemNo = totalCount - 1;
+            }
+            var pageResult = [];
+            if (startItemNo < totalCount) {
+                for (var index = startItemNo; index <= endItemNo; index++) {
+                    pageResult.push(findResponse.result[index]);
+                }
+            }
+            findResponse.result = pageResult;
+            res.send(findResponse);
+        } else {
+            res.send(findResponse);
+        }
     },
     getContentInfo: async (req, res) => {
         try {

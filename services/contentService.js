@@ -97,7 +97,7 @@ module.exports = {
     findAIContent: async (contentType, contentId) => {
         try {
             // 파이썬 코드 실행
-            const venvDir = './ai/capstone';
+            const venvDir = './ai/venv/capstone';
 
             const activateScript = path.join(venvDir, 'bin', 'activate');
             const pythonCommand = path.join(venvDir, 'bin', 'python');

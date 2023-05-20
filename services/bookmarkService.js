@@ -83,6 +83,8 @@ module.exports = {
                         },
                     });
                 }
+                findContentResult = findContentResult.toJSON();
+                findContentResult.contentType = contentType;
                 result.push(findContentResult);
             }
             const sortFunctions = {

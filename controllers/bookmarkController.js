@@ -13,10 +13,8 @@ module.exports = {
         if (type == undefined) {
             type = 'all';
         }
-        if (order == undefined) {
+        if (order == undefined || order == 'new') {
             order = [['createdAt', 'DESC']];
-        } else {
-            order = [order];
         }
 
         try {

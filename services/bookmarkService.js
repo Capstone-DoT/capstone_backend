@@ -30,10 +30,9 @@ module.exports = {
                         userId,
                         contentType,
                     },
-                    order: order,
+                    order: [['createdAt', 'DESC']],
                 });
             }
-            console.log(findBookmarkResult);
             let result = [];
             for (const data of findBookmarkResult) {
                 let contentId = data.dataValues.contentId;
@@ -83,15 +82,21 @@ module.exports = {
                 }
                 result.push(findContentResult);
             }
-
             const sortFunctions = {
                 view_num: (a, b) => b.view_num - a.view_num,
-                dday: (a, b) => a.dday - b.dday,
+                dday: (a, b) => a.dataValues.dday - b.dataValues.dday,
                 createdAt: (a, b) => b.createdAt - a.createdAt,
             };
 
-            const sortedResult = result.sort(sortFunctions[order]);
-            return response(baseResponse.SUCCESS, sortedResult);
+            if (
+                order == 'view_num' ||
+                order == 'dday' ||
+                order == 'createdAt'
+            ) {
+                const sortedResult = result.sort(sortFunctions[order]);
+                result = sortedResult;
+            }
+            return result;
         } catch (error) {
             console.log(error);
             return errResponse(baseResponse.DB_ERROR);

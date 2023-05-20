@@ -105,7 +105,7 @@ module.exports = {
             const pythonArgs = [`./ai/item2vec_${contentType}`, contentId, 5];
 
             const activateProcess = spawn(
-                `source ${activateScript} && ${pythonCommand}`,
+                `. ${activateScript} && ${pythonCommand}`,
                 [pythonScript, ...pythonArgs],
                 { shell: true }
             );

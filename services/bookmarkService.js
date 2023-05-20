@@ -38,24 +38,49 @@ module.exports = {
             for (const data of findBookmarkResult) {
                 let contentId = data.dataValues.contentId;
                 let contentType = data.dataValues.type;
-                let findContentResult = await Content[contentType].findOne({
-                    attributes: [
-                        'title',
-                        'institution',
-                        'type',
-                        'view_num',
-                        'createdAt',
-                        [
-                            sequelize.literal(
-                                '(SELECT DATEDIFF(end_date,NOW()))'
-                            ),
-                            'dday',
+                let findContentResult;
+                if (contentType == 'scholarship') {
+                    findContentResult = await Content[contentType].findOne({
+                        attributes: [
+                            'id',
+                            'title',
+                            'institution',
+                            'type',
+                            'view_num',
+                            'createdAt',
+                            [
+                                sequelize.literal(`DATEDIFF(
+        STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(period, '~', -1), '(', 1), '%Y. %m. %d.'),
+        CURDATE()
+      )`),
+                                'dday',
+                            ],
                         ],
-                    ],
-                    where: {
-                        id: contentId,
-                    },
-                });
+                        where: {
+                            id: contentId,
+                        },
+                    });
+                } else {
+                    findContentResult = await Content[contentType].findOne({
+                        attributes: [
+                            'id',
+                            'title',
+                            'institution',
+                            'type',
+                            'view_num',
+                            'createdAt',
+                            [
+                                sequelize.literal(
+                                    `DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE()) + 1`
+                                ),
+                                'dday',
+                            ],
+                        ],
+                        where: {
+                            id: contentId,
+                        },
+                    });
+                }
                 result.push(findContentResult);
             }
 

@@ -77,7 +77,12 @@ module.exports = {
             let contentType = urlObj.pathname.split('/')[1];
             let contentId = req.params.id;
 
-            let findResponse = await contentService.findContent(
+            let findResult = await contentService.findContent(
+                contentType,
+                contentId
+            );
+
+            let AIResult = await contentService.findAIContent(
                 contentType,
                 contentId
             );
@@ -93,7 +98,7 @@ module.exports = {
                 res.send(updateResult);
             }
 
-            res.send(findResponse);
+            res.send(response(baseResponse.SUCCESS, { findResult, AIResult }));
         } catch (err) {
             console.log(err);
             res.send(errResponse(baseResponse.SERVER_ERROR));

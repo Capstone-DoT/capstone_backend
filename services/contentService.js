@@ -2,6 +2,8 @@ const baseResponse = require('../config/baseResponseStatus');
 const { response, errResponse } = require('../config/response');
 const sequelize = require('sequelize');
 const models = require('../models');
+const spawn = require('child_process').spawn;
+const path = require('path');
 
 const db = new sequelize(
     process.env.MYSQL_DATABASE,
@@ -86,10 +88,97 @@ module.exports = {
                     id: contentId,
                 },
             });
-            return response(baseResponse.SUCCESS, findResult);
+            return findResult;
         } catch (err) {
             console.log(err);
             return errResponse(baseResponse.DB_ERROR);
+        }
+    },
+    findAIContent: async (contentType, contentId) => {
+        try {
+            // 파이썬 코드 실행
+            const venvDir = './ai/venv/capstone';
+
+            const activateScript = path.join(venvDir, 'bin', 'activate');
+            const pythonCommand = path.join(venvDir, 'bin', 'python');
+            const pythonScript = './ai/recommender.py';
+            const pythonArgs = [`./ai/item2vec_${contentType}`, contentId, 5];
+
+            const activateProcess = spawn(
+                `source ${activateScript} && ${pythonCommand}`,
+                [pythonScript, ...pythonArgs],
+                { shell: true }
+            );
+
+            // 파이썬 코드 실행 결과
+            let idList = [];
+            activateProcess.stdout.on('data', async (data) => {
+                idList = JSON.parse(data.toString().replace(/'/g, '"'));
+            });
+
+            activateProcess.stderr.on('data', (data) => {
+                console.error(data.toString());
+            });
+
+            await new Promise((resolve, reject) => {
+                activateProcess.on('close', (code) => {
+                    if (code === 0) {
+                        resolve();
+                    } else {
+                        reject(new Error(`Process exited with code ${code}`));
+                    }
+                });
+            });
+
+            // 파이썬 코드 실행 결과 바탕으로 정보 조회
+            let findResult;
+            const contentModel = Content[contentType];
+            if (contentType == 'scholarship') {
+                findResult = await contentModel.findAll({
+                    attributes: [
+                        'id',
+                        'title',
+                        'institution',
+                        'type',
+                        [
+                            sequelize.literal(`DATEDIFF(
+        STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(period, '~', -1), '(', 1), '%Y. %m. %d.'),
+        CURDATE()
+      )`),
+                            'dday',
+                        ],
+                    ],
+                    where: {
+                        id: {
+                            [Op.in]: idList,
+                        },
+                    },
+                });
+            } else {
+                findResult = await contentModel.findAll({
+                    attributes: [
+                        'id',
+                        'title',
+                        'institution',
+                        'type',
+                        [
+                            sequelize.literal(
+                                `DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE()) + 1`
+                            ),
+                            'dday',
+                        ],
+                    ],
+                    where: {
+                        id: {
+                            [Op.in]: idList,
+                        },
+                    },
+                });
+            }
+            return findResult;
+        } catch (err) {
+            console.log(err);
+            res.send(errResponse(baseResponse.SERVER_ERROR));
         }
     },
     updateContentView: async (contentType, contentId) => {

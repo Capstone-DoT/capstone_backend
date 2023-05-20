@@ -37,6 +37,7 @@ module.exports = {
             if (contentType == 'scholarship') {
                 findResult = await contentModel.findAll({
                     attributes: [
+                        'id',
                         'title',
                         'institution',
                         'type',
@@ -57,6 +58,7 @@ module.exports = {
             } else {
                 findResult = await contentModel.findAll({
                     attributes: [
+                        'id',
                         'title',
                         'institution',
                         'type',

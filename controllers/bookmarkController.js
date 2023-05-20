@@ -23,7 +23,8 @@ module.exports = {
                 type,
                 order
             );
-            res.send(findResult);
+            let AIResult = await bookmarkService.findAIContent(userId, type);
+            res.send(response(baseResponse.SUCCESS, { findResult, AIResult }));
         } catch (err) {
             console.log(err);
             res.send(errResponse(baseResponse.SERVER_ERROR));

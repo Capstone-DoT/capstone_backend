@@ -2,7 +2,7 @@ module.exports = (sequelize, DataTypes) => {
     const Bookmark = sequelize.define(
         'Bookmark',
         {
-            type: {
+            contentType: {
                 type: DataTypes.STRING(20),
                 allowNull: false,
                 primaryKey: true,

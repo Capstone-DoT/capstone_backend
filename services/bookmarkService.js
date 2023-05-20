@@ -17,7 +17,7 @@ module.exports = {
             let findBookmarkResult;
             if (contentType == 'all') {
                 findBookmarkResult = await Bookmark.findAll({
-                    attributes: ['type', 'contentId', 'createdAt'],
+                    attributes: ['contentType', 'contentId', 'createdAt'],
                     where: {
                         userId,
                     },
@@ -25,10 +25,10 @@ module.exports = {
                 });
             } else {
                 findBookmarkResult = await Bookmark.findAll({
-                    attributes: ['type', 'contentId', 'createdAt'],
+                    attributes: ['contentType', 'contentId', 'createdAt'],
                     where: {
                         userId,
-                        type: contentType,
+                        contentType,
                     },
                     order: order,
                 });
@@ -37,7 +37,7 @@ module.exports = {
             let result = [];
             for (const data of findBookmarkResult) {
                 let contentId = data.dataValues.contentId;
-                let contentType = data.dataValues.type;
+                let contentType = data.dataValues.contentType;
                 let findContentResult;
                 if (contentType == 'scholarship') {
                     findContentResult = await Content[contentType].findOne({

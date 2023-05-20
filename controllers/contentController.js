@@ -82,6 +82,11 @@ module.exports = {
                 contentId
             );
 
+            let AIResult = await contentService.findAIContent(
+                contentType,
+                contentId
+            );
+
             let updateResult;
             try {
                 updateResult = await contentService.updateContentView(
@@ -93,7 +98,9 @@ module.exports = {
                 res.send(updateResult);
             }
 
-            res.send(findResponse);
+            res.send(
+                response(baseResponse.SUCCESS, { findResponse, AIResult })
+            );
         } catch (err) {
             console.log(err);
             res.send(errResponse(baseResponse.SERVER_ERROR));

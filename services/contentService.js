@@ -50,7 +50,7 @@ module.exports = {
                         ],
                     ],
                     where: {
-                        [Op.and]: conditions,
+                        [Op.or]: conditions,
                         title: search,
                     },
                     order: [
@@ -77,7 +77,7 @@ module.exports = {
                         ],
                     ],
                     where: {
-                        [Op.and]: conditions,
+                        [Op.or]: conditions,
                         title: search,
                     },
                     order: [

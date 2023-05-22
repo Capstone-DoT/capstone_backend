@@ -120,11 +120,7 @@ module.exports = {
         }
 
         if ((ordering == undefined) | (ordering == 'new')) {
-            ordering = 'createdAt DESC';
-        } else if (ordering == 'view_num') {
-            ordering = 'view_num DESC';
-        } else {
-            ordering = ordering;
+            ordering = 'createdAt';
         }
 
         if ((search == undefined) | (search == 'all')) {

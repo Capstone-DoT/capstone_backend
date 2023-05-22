@@ -53,7 +53,14 @@ module.exports = {
                         [Op.and]: conditions,
                         title: search,
                     },
-                    order: ordering,
+                    order: [
+                        [
+                            sequelize.literal(
+                                `CASE WHEN dday >= 0 THEN 1 ELSE 2 END`
+                            ),
+                        ],
+                        ordering,
+                    ],
                 });
             } else {
                 findResult = await contentModel.findAll({
@@ -73,7 +80,12 @@ module.exports = {
                         [Op.and]: conditions,
                         title: search,
                     },
-                    order: ordering,
+                    order: [
+                        sequelize.literal(
+                            `CASE WHEN dday >= 0 THEN 1 ELSE 2 END`
+                        ),
+                    ],
+                    ordering,
                 });
             }
             return response(baseResponse.SUCCESS, findResult);
@@ -212,12 +224,13 @@ module.exports = {
         SELECT title, institution, type, (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE()) + 1) as dday, view_num, createdAt from Activities WHERE title LIKE '%${search}%'
         UNION
         SELECT title, institution, type, (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE()) + 1) as dday, view_num, createdAt from Contests WHERE title LIKE '%${search}%'
-        ORDER BY ${ordering}`;
+        ORDER BY CASE WHEN dday >= 0 THEN 0 ELSE 1 END, ABS(dday), ${ordering}`;
             } else if (contentType === 'Scholarships') {
-                queryString = `SELECT title, institution, type, (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(period, '~', -1), '(', 1), '%Y. %m. %d.'),CURDATE())) as dday, view_num, createdAt FROM Scholarships WHERE title LIKE '%${search}%'`;
+                queryString = `SELECT title, institution, type, (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(period, '~', -1), '(', 1), '%Y. %m. %d.'),CURDATE())) as dday, view_num, createdAt FROM Scholarships WHERE title LIKE '%${search}%'
+                ORDER BY CASE WHEN dday >= 0 THEN 0 ELSE 1 END, ABS(dday), ${ordering}`;
             } else {
                 queryString = `SELECT title, institution, type, (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE()) + 1) as dday, view_num, createdAt FROM ${contentType} WHERE title LIKE '%${search}%'
-        ORDER BY ${ordering}`;
+                ORDER BY CASE WHEN dday >= 0 THEN 0 ELSE 1 END, ABS(dday), ${ordering}`;
             }
             const findResult = await db.query(queryString, {
                 type: sequelize.QueryTypes.SELECT,

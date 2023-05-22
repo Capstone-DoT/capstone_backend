@@ -219,11 +219,11 @@ module.exports = {
         try {
             let queryString = ``;
             if (contentType === 'allContentType') {
-                queryString = `SELECT title, institution, type, (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(period, '~', -1), '(', 1), '%Y. %m. %d.'),CURDATE())) as dday, view_num, createdAt FROM Scholarships WHERE title LIKE '%${search}%'
+                queryString = `SELECT 'scholarship' AS contentType, title, institution, type, (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(period, '~', -1), '(', 1), '%Y. %m. %d.'),CURDATE())) as dday, view_num, createdAt FROM Scholarships WHERE title LIKE '%${search}%'
         UNION
-        SELECT title, institution, type, (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE()) + 1) as dday, view_num, createdAt from Activities WHERE title LIKE '%${search}%'
+        SELECT 'activity' AS contentType, title, institution, type, (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE()) + 1) as dday, view_num, createdAt from Activities WHERE title LIKE '%${search}%'
         UNION
-        SELECT title, institution, type, (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE()) + 1) as dday, view_num, createdAt from Contests WHERE title LIKE '%${search}%'
+        SELECT 'contest' AS contentType,  title, institution, type, (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE()) + 1) as dday, view_num, createdAt from Contests WHERE title LIKE '%${search}%'
         ORDER BY CASE WHEN dday >= 0 THEN 0 ELSE 1 END, ABS(dday), ${ordering}`;
             } else if (contentType === 'Scholarships') {
                 queryString = `SELECT title, institution, type, (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(period, '~', -1), '(', 1), '%Y. %m. %d.'),CURDATE())) as dday, view_num, createdAt FROM Scholarships WHERE title LIKE '%${search}%'

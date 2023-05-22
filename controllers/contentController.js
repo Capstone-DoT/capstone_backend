@@ -143,4 +143,13 @@ module.exports = {
         );
         res.send(findResult);
     },
+    getPopularContentList: async (req, res) => {
+        try {
+            let findResult = await contentService.findPopularContentList();
+            res.send(findResult);
+        } catch (err) {
+            console.log(err);
+            res.send(errResponse(baseResponse.SERVER_ERROR));
+        }
+    },
 };

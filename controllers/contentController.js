@@ -16,7 +16,7 @@ module.exports = {
         let pageNo = req.query.pageno;
 
         if ((type == undefined) | (type == 'all')) {
-            type = [];
+            type = [''];
         }
 
         if ((ordering == undefined) | (type == 'new')) {

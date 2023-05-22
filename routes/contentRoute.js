@@ -4,6 +4,7 @@ const router = express.Router();
 const contentController = require('../controllers/contentController');
 
 router.get('/', contentController.getAllContentList);
+router.get('/popular', contentController.getPopularContentList);
 
 router.get('/scholarship', contentController.getContentList);
 router.get('/scholarship/:id', contentController.getContentInfo);

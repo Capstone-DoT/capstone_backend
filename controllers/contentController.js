@@ -120,11 +120,7 @@ module.exports = {
         }
 
         if ((ordering == undefined) | (ordering == 'new')) {
-            ordering = 'createdAt DESC';
-        } else if (ordering == 'view_num') {
-            ordering = 'view_num DESC';
-        } else {
-            ordering = ordering;
+            ordering = 'createdAt';
         }
 
         if ((search == undefined) | (search == 'all')) {
@@ -142,5 +138,14 @@ module.exports = {
             search
         );
         res.send(findResult);
+    },
+    getPopularContentList: async (req, res) => {
+        try {
+            let findResult = await contentService.findPopularContentList();
+            res.send(findResult);
+        } catch (err) {
+            console.log(err);
+            res.send(errResponse(baseResponse.SERVER_ERROR));
+        }
     },
 };

@@ -134,128 +134,150 @@ module.exports = {
             for (const data of findBookmarkResult) {
                 const contentType = data.dataValues.contentType;
                 const contentId = data.dataValues.contentId;
-                if (contentType == 'scholarship') {
-                    if (bookmarkList.scholarship == '') {
-                        bookmarkList.scholarship = contentId;
-                    } else {
-                        bookmarkList.scholarship =
-                            bookmarkList.scholarship + ',' + contentId;
-                    }
-                } else if (contentType == 'contest') {
-                    if (bookmarkList.contest == '') {
-                        bookmarkList.contest = contentId;
-                    } else {
-                        bookmarkList.contest =
-                            bookmarkList.contest + ',' + contentId;
-                    }
+
+                if (contentType === 'scholarship') {
+                    bookmarkList.scholarship = bookmarkList.scholarship
+                        ? `${bookmarkList.scholarship},${contentId}`
+                        : contentId;
+                } else if (contentType === 'contest') {
+                    bookmarkList.contest = bookmarkList.contest
+                        ? `${bookmarkList.contest},${contentId}`
+                        : contentId;
                 } else {
-                    if (bookmarkList.activity == '') {
-                        bookmarkList.activity = contentId;
-                    } else {
-                        bookmarkList.activity =
-                            bookmarkList.activity + ',' + contentId;
-                    }
+                    bookmarkList.activity = bookmarkList.activity
+                        ? `${bookmarkList.activity},${contentId}`
+                        : contentId;
                 }
             }
 
-            // AI 실행하기
             const venvDir = './ai/venv/capstone';
             const activateScript = path.join(venvDir, 'bin', 'activate');
             const pythonCommand = path.join(venvDir, 'bin', 'python');
             const pythonScript = './ai/recommender.py';
 
             for (const contentType of ['scholarship', 'contest', 'activity']) {
-                if (bookmarkList[contentType] == '') {
+                if (!bookmarkList[contentType]) {
                     continue;
                 }
 
-                const pythonArgs = [
-                    `./ai/item2vec_${contentType}`,
-                    bookmarkList[contentType],
-                    3,
-                ];
+                let idList;
 
-                const activateProcess = spawn(
-                    `. ${activateScript} && ${pythonCommand}`,
-                    [pythonScript, ...pythonArgs],
-                    { shell: true }
-                );
+                try {
+                    const pythonArgs = [
+                        `./ai/item2vec_${contentType}`,
+                        bookmarkList[contentType],
+                        3,
+                    ];
 
-                let idList = [];
-                activateProcess.stdout.on('data', async (data) => {
-                    idList = JSON.parse(data.toString().replace(/'/g, '"'));
-                });
+                    const activateProcess = spawn(
+                        `. ${activateScript} && ${pythonCommand}`,
+                        [pythonScript, ...pythonArgs],
+                        { shell: true }
+                    );
 
-                activateProcess.stderr.on('data', (data) => {
-                    console.error(data.toString());
-                });
-
-                await new Promise((resolve, reject) => {
-                    activateProcess.on('close', (code) => {
-                        if (code === 0) {
-                            resolve();
-                        } else {
-                            reject(
-                                new Error(`Process exited with code ${code}`)
-                            );
-                        }
+                    activateProcess.stdout.on('data', async (data) => {
+                        idList = JSON.parse(data.toString().replace(/'/g, '"'));
                     });
-                });
 
-                // AI 결과로 content 조회하기
+                    activateProcess.stderr.on('data', (data) => {
+                        console.error(data.toString());
+                    });
+
+                    await new Promise((resolve, reject) => {
+                        activateProcess.on('close', (code) => {
+                            if (code === 0) {
+                                resolve();
+                            } else {
+                                reject(
+                                    new Error(
+                                        `Process exited with code ${code}`
+                                    )
+                                );
+                            }
+                        });
+                    });
+                } catch (err) {
+                    console.log(err);
+
+                    try {
+                        const pythonArgs = [
+                            `./ai/item2vec_${contentType}_err`,
+                            bookmarkList[contentType],
+                            3,
+                        ];
+
+                        const activateProcess = spawn(
+                            `. ${activateScript} && ${pythonCommand}`,
+                            [pythonScript, ...pythonArgs],
+                            { shell: true }
+                        );
+
+                        activateProcess.stdout.on('data', async (data) => {
+                            idList = JSON.parse(
+                                data.toString().replace(/'/g, '"')
+                            );
+                        });
+
+                        activateProcess.stderr.on('data', (data) => {
+                            console.error(data.toString());
+                        });
+
+                        await new Promise((resolve, reject) => {
+                            activateProcess.on('close', (code) => {
+                                if (code === 0) {
+                                    resolve();
+                                } else {
+                                    reject(
+                                        new Error(
+                                            `Process exited with code ${code}`
+                                        )
+                                    );
+                                }
+                            });
+                        });
+                    } catch (err) {
+                        console.log(err);
+                        return '정보가 부족해 AI 추천 정보를 불러올 수 없습니다';
+                    }
+                }
+
                 const contentModel = Content[contentType];
                 let findResultList = [];
 
-                if (contentType === 'scholarship') {
-                    findResultList = await contentModel.findAll({
-                        attributes: [
-                            'id',
-                            'title',
-                            'institution',
-                            'type',
-                            [
-                                sequelize.literal(`DATEDIFF(
-                STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(period, '~', -1), '(', 1), '%Y. %m. %d.'),
-                CURDATE()
-              )`),
-                                'dday',
-                            ],
-                        ],
-                        where: {
-                            id: {
-                                [Op.in]: idList,
-                            },
+                const commonAttributes = [
+                    'id',
+                    'title',
+                    'institution',
+                    'type',
+                    [
+                        sequelize.literal(
+                            contentType === 'scholarship'
+                                ? `DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(period, '~', -1), '(', 1), '%Y. %m. %d.'), CURDATE())`
+                                : `DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE()) + 1`
+                        ),
+                        'dday',
+                    ],
+                ];
+
+                findResultList = await contentModel.findAll({
+                    attributes: commonAttributes,
+                    where: {
+                        id: {
+                            [Op.in]: idList,
                         },
-                    });
-                } else {
-                    findResultList = await contentModel.findAll({
-                        attributes: [
-                            'id',
-                            'title',
-                            'institution',
-                            'type',
-                            [
-                                sequelize.literal(
-                                    `DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE()) + 1`
-                                ),
-                                'dday',
-                            ],
-                        ],
-                        where: {
-                            id: {
-                                [Op.in]: idList,
-                            },
-                        },
-                    });
-                }
+                    },
+                });
+
                 findResult[contentType] = findResultList;
             }
+
             return findResult;
         } catch (err) {
             console.log(err);
             res.send(errResponse(baseResponse.SERVER_ERROR));
         }
     },
+
     createBookmark: async (type, contentId, userId) => {
         try {
             await Bookmark.create({

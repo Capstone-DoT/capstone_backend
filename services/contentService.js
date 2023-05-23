@@ -110,85 +110,92 @@ module.exports = {
     },
     findAIContent: async (contentType, contentId) => {
         try {
-            // 파이썬 코드 실행
             const venvDir = './ai/venv/capstone';
-
             const activateScript = path.join(venvDir, 'bin', 'activate');
             const pythonCommand = path.join(venvDir, 'bin', 'python');
             const pythonScript = './ai/recommender.py';
-            const pythonArgs = [`./ai/item2vec_${contentType}`, contentId, 5];
+            let pythonArgs = [`./ai/item2vec_${contentType}`, contentId, 5];
 
-            const activateProcess = spawn(
-                `. ${activateScript} && ${pythonCommand}`,
-                [pythonScript, ...pythonArgs],
-                { shell: true }
-            );
-
-            // 파이썬 코드 실행 결과
             let idList = [];
-            activateProcess.stdout.on('data', async (data) => {
-                idList = JSON.parse(data.toString().replace(/'/g, '"'));
-            });
 
-            activateProcess.stderr.on('data', (data) => {
-                console.error(data.toString());
-            });
+            const executePythonProcess = async (args) => {
+                return new Promise((resolve, reject) => {
+                    const activateProcess = spawn(
+                        `. ${activateScript} && ${pythonCommand}`,
+                        [pythonScript, ...args],
+                        { shell: true }
+                    );
 
-            await new Promise((resolve, reject) => {
-                activateProcess.on('close', (code) => {
-                    if (code === 0) {
-                        resolve();
-                    } else {
-                        reject(new Error(`Process exited with code ${code}`));
-                    }
+                    let processOutput = '';
+
+                    activateProcess.stdout.on('data', (data) => {
+                        processOutput += data.toString();
+                    });
+
+                    activateProcess.stderr.on('data', (data) => {
+                        console.error(data.toString());
+                    });
+
+                    activateProcess.on('close', (code) => {
+                        if (code === 0) {
+                            resolve(processOutput);
+                        } else {
+                            reject(
+                                new Error(`Process exited with code ${code}`)
+                            );
+                        }
+                    });
                 });
-            });
+            };
 
-            // 파이썬 코드 실행 결과 바탕으로 정보 조회
+            try {
+                // 첫 번째 시도: 원래 파이썬 코드 실행
+                const output = await executePythonProcess(pythonArgs);
+                idList = JSON.parse(output.replace(/'/g, '"'));
+            } catch (err) {
+                console.log(err);
+                try {
+                    // 두 번째 시도: 오류 발생 시 파이썬 코드 실행 (에러 처리용)
+                    pythonArgs = [
+                        `./ai/item2vec_${contentType}_err`,
+                        contentId,
+                        5,
+                    ];
+                    const output = await executePythonProcess(pythonArgs);
+                    idList = JSON.parse(output.replace(/'/g, '"'));
+                } catch (err) {
+                    console.log(err);
+                    return '정보가 부족해 AI 추천 정보를 불러올 수 없습니다.';
+                }
+            }
+
+            // 파이썬 코드 실행 결과를 바탕으로 정보 조회
             let findResult;
             const contentModel = Content[contentType];
-            if (contentType == 'scholarship') {
-                findResult = await contentModel.findAll({
-                    attributes: [
-                        'id',
-                        'title',
-                        'institution',
-                        'type',
-                        [
-                            sequelize.literal(`DATEDIFF(
-        STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(period, '~', -1), '(', 1), '%Y. %m. %d.'),
-        CURDATE()
-      )`),
-                            'dday',
-                        ],
+            const dateExpression =
+                contentType === 'scholarship'
+                    ? `STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(period, '~', -1), '(', 1), '%Y. %m. %d.')`
+                    : `STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d')`;
+            findResult = await contentModel.findAll({
+                attributes: [
+                    'id',
+                    'title',
+                    'institution',
+                    'type',
+                    [
+                        sequelize.literal(
+                            `DATEDIFF(${dateExpression}, CURDATE())`
+                        ),
+                        'dday',
                     ],
-                    where: {
-                        id: {
-                            [Op.in]: idList,
-                        },
+                ],
+                where: {
+                    id: {
+                        [Op.in]: idList,
                     },
-                });
-            } else {
-                findResult = await contentModel.findAll({
-                    attributes: [
-                        'id',
-                        'title',
-                        'institution',
-                        'type',
-                        [
-                            sequelize.literal(
-                                `DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE()) + 1`
-                            ),
-                            'dday',
-                        ],
-                    ],
-                    where: {
-                        id: {
-                            [Op.in]: idList,
-                        },
-                    },
-                });
-            }
+                },
+            });
+
             return findResult;
         } catch (err) {
             console.log(err);

@@ -134,43 +134,36 @@ module.exports = {
             for (const data of findBookmarkResult) {
                 const contentType = data.dataValues.contentType;
                 const contentId = data.dataValues.contentId;
-                if (contentType == 'scholarship') {
-                    if (bookmarkList.scholarship == '') {
-                        bookmarkList.scholarship = contentId;
-                    } else {
-                        bookmarkList.scholarship =
-                            bookmarkList.scholarship + ',' + contentId;
-                    }
-                } else if (contentType == 'contest') {
-                    if (bookmarkList.contest == '') {
-                        bookmarkList.contest = contentId;
-                    } else {
-                        bookmarkList.contest =
-                            bookmarkList.contest + ',' + contentId;
-                    }
+
+                if (contentType === 'scholarship') {
+                    bookmarkList.scholarship = bookmarkList.scholarship
+                        ? `${bookmarkList.scholarship},${contentId}`
+                        : contentId;
+                } else if (contentType === 'contest') {
+                    bookmarkList.contest = bookmarkList.contest
+                        ? `${bookmarkList.contest},${contentId}`
+                        : contentId;
                 } else {
-                    if (bookmarkList.activity == '') {
-                        bookmarkList.activity = contentId;
-                    } else {
-                        bookmarkList.activity =
-                            bookmarkList.activity + ',' + contentId;
-                    }
+                    bookmarkList.activity = bookmarkList.activity
+                        ? `${bookmarkList.activity},${contentId}`
+                        : contentId;
                 }
             }
 
-            // AI 실행하기
             const venvDir = './ai/venv/capstone';
             const activateScript = path.join(venvDir, 'bin', 'activate');
             const pythonCommand = path.join(venvDir, 'bin', 'python');
             const pythonScript = './ai/recommender.py';
 
             for (const contentType of ['scholarship', 'contest', 'activity']) {
-                if (bookmarkList[contentType] == '') {
+                if (!bookmarkList[contentType]) {
                     continue;
                 }
+
                 let idList;
+
                 try {
-                    let pythonArgs = [
+                    const pythonArgs = [
                         `./ai/item2vec_${contentType}`,
                         bookmarkList[contentType],
                         3,
@@ -205,8 +198,9 @@ module.exports = {
                     });
                 } catch (err) {
                     console.log(err);
+
                     try {
-                        let pythonArgs = [
+                        const pythonArgs = [
                             `./ai/item2vec_${contentType}_err`,
                             bookmarkList[contentType],
                             3,
@@ -247,60 +241,43 @@ module.exports = {
                     }
                 }
 
-                // AI 결과로 content 조회하기
                 const contentModel = Content[contentType];
                 let findResultList = [];
 
-                if (contentType === 'scholarship') {
-                    findResultList = await contentModel.findAll({
-                        attributes: [
-                            'id',
-                            'title',
-                            'institution',
-                            'type',
-                            [
-                                sequelize.literal(`DATEDIFF(
-                STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(period, '~', -1), '(', 1), '%Y. %m. %d.'),
-                CURDATE()
-              )`),
-                                'dday',
-                            ],
-                        ],
-                        where: {
-                            id: {
-                                [Op.in]: idList,
-                            },
+                const commonAttributes = [
+                    'id',
+                    'title',
+                    'institution',
+                    'type',
+                    [
+                        sequelize.literal(
+                            contentType === 'scholarship'
+                                ? `DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(period, '~', -1), '(', 1), '%Y. %m. %d.'), CURDATE())`
+                                : `DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE()) + 1`
+                        ),
+                        'dday',
+                    ],
+                ];
+
+                findResultList = await contentModel.findAll({
+                    attributes: commonAttributes,
+                    where: {
+                        id: {
+                            [Op.in]: idList,
                         },
-                    });
-                } else {
-                    findResultList = await contentModel.findAll({
-                        attributes: [
-                            'id',
-                            'title',
-                            'institution',
-                            'type',
-                            [
-                                sequelize.literal(
-                                    `DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE()) + 1`
-                                ),
-                                'dday',
-                            ],
-                        ],
-                        where: {
-                            id: {
-                                [Op.in]: idList,
-                            },
-                        },
-                    });
-                }
+                    },
+                });
+
                 findResult[contentType] = findResultList;
             }
+
             return findResult;
         } catch (err) {
             console.log(err);
             res.send(errResponse(baseResponse.SERVER_ERROR));
         }
     },
+
     createBookmark: async (type, contentId, userId) => {
         try {
             await Bookmark.create({

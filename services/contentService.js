@@ -165,7 +165,7 @@ module.exports = {
                     idList = JSON.parse(output.replace(/'/g, '"'));
                 } catch (err) {
                     console.log(err);
-                    return '정보가 부족해 AI 추천 정보를 불러올 수 없습니다.';
+                    return [];
                 }
             }
 

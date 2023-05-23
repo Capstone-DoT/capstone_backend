@@ -168,39 +168,84 @@ module.exports = {
                 if (bookmarkList[contentType] == '') {
                     continue;
                 }
+                let idList;
+                try {
+                    let pythonArgs = [
+                        `./ai/item2vec_${contentType}`,
+                        bookmarkList[contentType],
+                        3,
+                    ];
 
-                const pythonArgs = [
-                    `./ai/item2vec_${contentType}`,
-                    bookmarkList[contentType],
-                    3,
-                ];
+                    const activateProcess = spawn(
+                        `. ${activateScript} && ${pythonCommand}`,
+                        [pythonScript, ...pythonArgs],
+                        { shell: true }
+                    );
 
-                const activateProcess = spawn(
-                    `. ${activateScript} && ${pythonCommand}`,
-                    [pythonScript, ...pythonArgs],
-                    { shell: true }
-                );
-
-                let idList = [];
-                activateProcess.stdout.on('data', async (data) => {
-                    idList = JSON.parse(data.toString().replace(/'/g, '"'));
-                });
-
-                activateProcess.stderr.on('data', (data) => {
-                    console.error(data.toString());
-                });
-
-                await new Promise((resolve, reject) => {
-                    activateProcess.on('close', (code) => {
-                        if (code === 0) {
-                            resolve();
-                        } else {
-                            reject(
-                                new Error(`Process exited with code ${code}`)
-                            );
-                        }
+                    activateProcess.stdout.on('data', async (data) => {
+                        idList = JSON.parse(data.toString().replace(/'/g, '"'));
                     });
-                });
+
+                    activateProcess.stderr.on('data', (data) => {
+                        console.error(data.toString());
+                    });
+
+                    await new Promise((resolve, reject) => {
+                        activateProcess.on('close', (code) => {
+                            if (code === 0) {
+                                resolve();
+                            } else {
+                                reject(
+                                    new Error(
+                                        `Process exited with code ${code}`
+                                    )
+                                );
+                            }
+                        });
+                    });
+                } catch (err) {
+                    console.log(err);
+                    try {
+                        let pythonArgs = [
+                            `./ai/item2vec_${contentType}_err`,
+                            bookmarkList[contentType],
+                            3,
+                        ];
+
+                        const activateProcess = spawn(
+                            `. ${activateScript} && ${pythonCommand}`,
+                            [pythonScript, ...pythonArgs],
+                            { shell: true }
+                        );
+
+                        activateProcess.stdout.on('data', async (data) => {
+                            idList = JSON.parse(
+                                data.toString().replace(/'/g, '"')
+                            );
+                        });
+
+                        activateProcess.stderr.on('data', (data) => {
+                            console.error(data.toString());
+                        });
+
+                        await new Promise((resolve, reject) => {
+                            activateProcess.on('close', (code) => {
+                                if (code === 0) {
+                                    resolve();
+                                } else {
+                                    reject(
+                                        new Error(
+                                            `Process exited with code ${code}`
+                                        )
+                                    );
+                                }
+                            });
+                        });
+                    } catch (err) {
+                        console.log(err);
+                        return '정보가 부족해 AI 추천 정보를 불러올 수 없습니다';
+                    }
+                }
 
                 // AI 결과로 content 조회하기
                 const contentModel = Content[contentType];

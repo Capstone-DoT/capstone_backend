@@ -281,11 +281,11 @@ module.exports = {
     },
     findPopularContentList: async () => {
         try {
-            let queryString = `SELECT 'scholarship' AS contentType, title, institution, type, (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(period, '~', -1), '(', 1), '%Y. %m. %d.'),CURDATE())) as dday, view_num, createdAt FROM Scholarships
+            let queryString = `SELECT 'scholarship' AS contentType, id, title, institution, type, (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(period, '~', -1), '(', 1), '%Y. %m. %d.'),CURDATE())) as dday, view_num, createdAt FROM Scholarships
         UNION
-        SELECT 'activity' AS contentType, title, institution, type, (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE()) + 1) as dday, view_num, createdAt from Activities
+        SELECT 'activity' AS contentType, id, title, institution, type, (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE()) + 1) as dday, view_num, createdAt from Activities
         UNION
-        SELECT 'contest' AS contentType, title, institution, type, (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE()) + 1) as dday, view_num, createdAt from Contests 
+        SELECT 'contest' AS contentType, id, title, institution, type, (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE()) + 1) as dday, view_num, createdAt from Contests 
         ORDER BY CASE WHEN dday >= 0 THEN 0 ELSE 1 END, ABS(dday), view_num DESC LIMIT 50`;
             const findResult = await db.query(queryString, {
                 type: sequelize.QueryTypes.SELECT,

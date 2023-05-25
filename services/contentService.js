@@ -84,8 +84,8 @@ module.exports = {
                         sequelize.literal(
                             `CASE WHEN dday >= 0 THEN 1 ELSE 2 END`
                         ),
+                        ordering,
                     ],
-                    ordering,
                 });
             }
             return response(baseResponse.SUCCESS, findResult);

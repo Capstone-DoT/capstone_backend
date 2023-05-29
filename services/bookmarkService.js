@@ -281,7 +281,7 @@ module.exports = {
     createBookmark: async (type, contentId, userId) => {
         try {
             await Bookmark.create({
-                type: type,
+                contentType: type,
                 contentId: contentId,
                 userId: userId,
             });

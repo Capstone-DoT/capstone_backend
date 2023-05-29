@@ -298,7 +298,7 @@ module.exports = {
         try {
             await Bookmark.destroy({
                 where: {
-                    type: type,
+                    contentType: type,
                     contentId: contentId,
                     userId: userId,
                 },

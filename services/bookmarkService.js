@@ -89,7 +89,7 @@ module.exports = {
             }
             const sortFunctions = {
                 view_num: (a, b) => b.view_num - a.view_num,
-                dday: (a, b) => a.dataValues.dday - b.dataValues.dday,
+                dday: (a, b) => a.dday - b.dday,
                 createdAt: (a, b) => b.createdAt - a.createdAt,
             };
 

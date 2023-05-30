@@ -71,7 +71,7 @@ module.exports = {
                         'type',
                         [
                             sequelize.literal(
-                                `DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE()) + 1`
+                                `DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE())`
                             ),
                             'dday',
                         ],
@@ -247,13 +247,13 @@ module.exports = {
                 WHERE title LIKE '%${search}%'
                 UNION
                 SELECT 'activity' AS contentType, id, title, institution, type, 
-                       (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE()) + 1) as dday,
+                       (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE())) as dday,
                        view_num, createdAt
                 FROM Activities
                 WHERE title LIKE '%${search}%'
                 UNION
                 SELECT 'contest' AS contentType, id, title, institution, type, 
-                       (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE()) + 1) as dday,
+                       (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE())) as dday,
                        view_num, createdAt
                 FROM Contests
                 WHERE title LIKE '%${search}%'
@@ -283,9 +283,9 @@ module.exports = {
         try {
             let queryString = `SELECT 'scholarship' AS contentType, id, title, institution, type, (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(period, '~', -1), '(', 1), '%Y. %m. %d.'),CURDATE())) as dday, view_num, createdAt FROM Scholarships
         UNION
-        SELECT 'activity' AS contentType, id, title, institution, type, (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE()) + 1) as dday, view_num, createdAt from Activities
+        SELECT 'activity' AS contentType, id, title, institution, type, (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE())) as dday, view_num, createdAt from Activities
         UNION
-        SELECT 'contest' AS contentType, id, title, institution, type, (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE()) + 1) as dday, view_num, createdAt from Contests 
+        SELECT 'contest' AS contentType, id, title, institution, type, (DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE())) as dday, view_num, createdAt from Contests 
         ORDER BY CASE WHEN dday >= 0 THEN 0 ELSE 1 END, ABS(dday), view_num DESC LIMIT 50`;
             const findResult = await db.query(queryString, {
                 type: sequelize.QueryTypes.SELECT,

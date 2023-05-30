@@ -73,7 +73,7 @@ module.exports = {
                             'createdAt',
                             [
                                 sequelize.literal(
-                                    `DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE()) + 1`
+                                    `DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE())`
                                 ),
                                 'dday',
                             ],
@@ -253,7 +253,7 @@ module.exports = {
                         sequelize.literal(
                             contentType === 'scholarship'
                                 ? `DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(period, '~', -1), '(', 1), '%Y. %m. %d.'), CURDATE())`
-                                : `DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE()) + 1`
+                                : `DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX(period, ' ~ ', -1), '%y.%m.%d'), CURDATE())`
                         ),
                         'dday',
                     ],

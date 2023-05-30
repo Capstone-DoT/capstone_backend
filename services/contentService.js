@@ -114,7 +114,7 @@ module.exports = {
             const activateScript = path.join(venvDir, 'bin', 'activate');
             const pythonCommand = path.join(venvDir, 'bin', 'python');
             const pythonScript = './ai/recommender.py';
-            let pythonArgs = [`./ai/item2vec_${contentType}`, contentId, 5];
+            let pythonArgs = [`./ai/item2vec_${contentType}`, contentId, 3];
 
             let idList = [];
 
@@ -162,7 +162,7 @@ module.exports = {
                     pythonArgs = [
                         `./ai/item2vec_${contentType}_err`,
                         contentId,
-                        5,
+                        3,
                     ];
                     const output = await executePythonProcess(pythonArgs);
                     idList = JSON.parse(output.replace(/'/g, '"'));

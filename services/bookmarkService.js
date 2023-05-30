@@ -309,4 +309,23 @@ module.exports = {
             return errResponse(baseResponse.DB_ERROR);
         }
     },
+    findBookmarkById: async (userId, contentType, contentId) => {
+        try {
+            let findResult = await Bookmark.findOne({
+                where: {
+                    userId,
+                    contentType,
+                    contentId,
+                },
+            });
+            if (findResult == null) {
+                return { isExist: false };
+            } else {
+                return { isExist: true };
+            }
+        } catch (err) {
+            console.log(err);
+            return errResponse(baseResponse.DB_ERROR);
+        }
+    },
 };

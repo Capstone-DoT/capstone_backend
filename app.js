@@ -1,5 +1,6 @@
 var createError = require('http-errors');
 var express = require('express');
+const session = require('express-session');
 var path = require('path');
 var cors = require('cors');
 var morgan = require('morgan');
@@ -20,6 +21,14 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+
+app.use(
+    session({
+        secret: 'dotdotdot',
+        resave: false,
+        saveUninitialized: true,
+    })
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

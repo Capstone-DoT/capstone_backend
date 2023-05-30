@@ -60,6 +60,7 @@ module.exports = {
             const findUserResult = await userService.findUserById(id);
             let hashedPassword = findUserResult.password;
             let salt = findUserResult.salt;
+            let session = req.session;
 
             const verified = await verifyPassword(
                 password,
@@ -69,6 +70,8 @@ module.exports = {
 
             if (verified) {
                 const jwtToken = await jwt.sign(findUserResult);
+                session.token = jwtToken;
+                session.save(function () {});
                 return res.send(
                     response(baseResponse.SUCCESS, { token: jwtToken.token })
                 );
@@ -84,5 +87,18 @@ module.exports = {
         res.send(
             response(baseResponse.TOKEN_VERIFICATION_SUCCESS, { id: req.id })
         );
+    },
+    sessionTest: async (req, res) => {
+        // 세션에서 토큰 가져오기
+        const token = req.session.token;
+
+        // 토큰을 사용하여 인증 처리
+        if (token) {
+            // 인증 성공
+            res.send('Authenticated');
+        } else {
+            // 인증 실패
+            res.status(401).send('Unauthorized');
+        }
     },
 };

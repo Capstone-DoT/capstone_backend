@@ -12,7 +12,7 @@ def recommender(path, positive_list=None, negative_list=None, topn=20):
     # 모델에서 탐색
     for scholarshipId, prob in model.wv.most_similar_cosmul(positive=positive_list, negative=negative_list, topn=topn):
         recommend_scholarship_ls.append(scholarshipId)
-    print(recommend_scholarship_ls)
+    # print(recommend_scholarship_ls)
     return recommend_scholarship_ls
 
 if __name__ == '__main__':
@@ -21,5 +21,12 @@ if __name__ == '__main__':
     positive_ls = str(inputs[1])
     positive_list = positive_ls.split(",")
     topn = int(inputs[2])
-
-    recommender(path=path, positive_list=positive_list, topn=topn)
+    
+    input_list = [] # 최종 인풋
+    for input in positive_list:
+        try:
+            recommender(path=path, positive_list=[input], topn=topn)
+            input_list.append(input)
+        except Exception as e:
+            continue
+    print(recommender(path=path, positive_list=input_list, topn=topn))

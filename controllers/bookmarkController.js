@@ -64,4 +64,20 @@ module.exports = {
             res.send(errResponse(baseResponse.SERVER_ERROR));
         }
     },
+    checkBookmark: async (req, res) => {
+        let userId = req.id;
+        let contentType = req.query.contentType;
+        let contentId = req.query.contentId;
+        try {
+            let findResult = await bookmarkService.findBookmarkById(
+                userId,
+                contentType,
+                contentId
+            );
+            res.send(response(baseResponse.SUCCESS, findResult));
+        } catch (err) {
+            console.log(err);
+            res.send(errResponse(baseResponse.SERVER_ERROR));
+        }
+    },
 };

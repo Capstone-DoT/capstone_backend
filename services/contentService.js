@@ -118,6 +118,8 @@ module.exports = {
 
             let idList = [];
 
+            let AI = false;
+
             const executePythonProcess = async (args) => {
                 return new Promise((resolve, reject) => {
                     const activateProcess = spawn(
@@ -152,6 +154,7 @@ module.exports = {
                 // 첫 번째 시도: 원래 파이썬 코드 실행
                 const output = await executePythonProcess(pythonArgs);
                 idList = JSON.parse(output.replace(/'/g, '"'));
+                AI = true;
             } catch (err) {
                 console.log(err);
                 try {
@@ -196,7 +199,7 @@ module.exports = {
                 },
             });
 
-            return findResult;
+            return { findResult, AI };
         } catch (err) {
             console.log(err);
             res.send(errResponse(baseResponse.SERVER_ERROR));

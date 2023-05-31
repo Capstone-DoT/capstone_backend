@@ -23,6 +23,9 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.INTEGER(10),
                 defaultValue: 0,
             },
+            ben: DataTypes.STRING(1000),
+            app: DataTypes.STRING(1000),
+            req: DataTypes.STRING(1000),
         },
         {
             updatedAt: false,

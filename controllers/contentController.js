@@ -4,6 +4,7 @@ const contentService = require('../services/contentService');
 const url = require('url');
 const sequelize = require('sequelize');
 const Op = sequelize.Op;
+const { redisClient } = require('../app');
 
 module.exports = {
     getContentList: async (req, res) => {
@@ -142,6 +143,7 @@ module.exports = {
     getPopularContentList: async (req, res) => {
         try {
             let findResult = await contentService.findPopularContentList();
+            await redisClient.setEx(req.url, 1440, JSON.stringify(findResult));
             res.send(findResult);
         } catch (err) {
             console.log(err);

@@ -5,6 +5,19 @@ var path = require('path');
 var cors = require('cors');
 var morgan = require('morgan');
 
+const redis = require('redis');
+const redisClient = redis.createClient({ legacyMode: true });
+
+redisClient.on('connect', () => {
+    console.info('Redis connected!');
+});
+redisClient.on('error', (err) => {
+    console.error('Redis error!', err);
+});
+redisClient.connect().then();
+const redisCli = redisClient.v4;
+module.exports.redisClient = redisCli;
+
 var indexRouter = require('./routes/index');
 var ContentRouter = require('./routes/contentRoute');
 var userRouter = require('./routes/userRoute');

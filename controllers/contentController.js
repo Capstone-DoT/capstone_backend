@@ -65,6 +65,17 @@ module.exports = {
                 }
             }
             findResponse.result = pageResult;
+            if (
+                urlStr == '/scholarship?pageno=1' ||
+                urlStr == '/activity?pageno=1' ||
+                urlStr == '/contest?pageno=1'
+            ) {
+                await redisClient.setEx(
+                    urlStr,
+                    1440,
+                    JSON.stringify(findResponse)
+                );
+            }
             res.send(findResponse);
         } else {
             res.send(findResponse);
@@ -138,6 +149,9 @@ module.exports = {
             ordering,
             search
         );
+        if (req.url == '/') {
+            await redisClient.setEx(req.url, 1440, JSON.stringify(findResult));
+        }
         res.send(findResult);
     },
     getPopularContentList: async (req, res) => {

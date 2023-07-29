@@ -14,16 +14,16 @@ const checkCache = async function (req, res, next) {
     }
 };
 
-router.get('/', contentController.getAllContentList);
+router.get('/', checkCache, contentController.getAllContentList);
 router.get('/popular', checkCache, contentController.getPopularContentList);
 
-router.get('/scholarship', contentController.getContentList);
+router.get('/scholarship', checkCache, contentController.getContentList);
 router.get('/scholarship/:id', contentController.getContentInfo);
 
-router.get('/activity', contentController.getContentList);
+router.get('/activity', checkCache, contentController.getContentList);
 router.get('/activity/:id', contentController.getContentInfo);
 
-router.get('/contest', contentController.getContentList);
+router.get('/contest', checkCache, contentController.getContentList);
 router.get('/contest/:id', contentController.getContentInfo);
 
 module.exports = router;
